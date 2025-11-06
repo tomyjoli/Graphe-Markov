@@ -1,12 +1,8 @@
-cmake_minimum_required(VERSION 3.30)
-project(Graphe_Markov)
+cmake_minimum_required(VERSION 3.24)
+project(2526_TI301_PJT C)
 
-set(CMAKE_CXX_STANDARD 14)
+set(CMAKE_C_STANDARD 11)
 
-add_executable(Graphe_Markov
-    .idea/.gitignore
-    .idea/editor.xml
-    .idea/Graphe-Markov.iml
-    .idea/modules.xml
-    .idea/vcs.xml
-    .idea/workspace.xml)
+add_executable(TI_301_PJT
+        main.c utils.c)
+
