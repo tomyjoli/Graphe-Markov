@@ -9,9 +9,9 @@ void processFile(const char *filename) {
     printAdjacencyList(adjList);
 
     if (isMarkovGraph(adjList)) {
-        printf("✅ Le graphe est un graphe de Markov valide.\n");
+        printf("Le graphe est un graphe de Markov valide.\n");
     } else {
-        printf("❌ Le graphe n'est PAS un graphe de Markov.\n");
+        printf("Le graphe n'est PAS un graphe de Markov.\n");
     }
 
     char outputFilename[256];
@@ -22,13 +22,16 @@ void processFile(const char *filename) {
     freeAdjacencyList(&adjList);
 }
 
+//  INDICATIONS POUR LE CORRECTEUR /!\
+//  ECRIVEZ LE CHEMIN ABSOLU DES FICHIERS EXEMPLES POUR QUE CELA FONCTIONNE /!\
+
 int main() {
     const char *filenames[] = {
-        "exemple1.txt",
-        "exemple_valid_step3.txt",
-        "exemple_scc1.txt",
-        "exemple3.txt",
-        "exemple4_2check.txt"
+        "C:/Users/tomyj/CLionProjects/Graphe-Markov/data/exemple1.txt",
+        "C:/Users/tomyj/CLionProjects/Graphe-Markov/data/exemple_valid_step3.txt",
+        "C:/Users/tomyj/CLionProjects/Graphe-Markov/data/exemple_scc1.txt",
+        "C:/Users/tomyj/CLionProjects/Graphe-Markov/data/exemple3.txt",
+        "C:/Users/tomyj/CLionProjects/Graphe-Markov/data/exemple4_2check.txt"
     };
     int numFiles = sizeof(filenames) / sizeof(filenames[0]);
 
