@@ -17,22 +17,21 @@ void processFile(const char *filename) {
     char outputFilename[256];
     snprintf(outputFilename, sizeof(outputFilename), "%s.mmd", filename);
     generateMermaidFile(adjList, outputFilename);
-    printf("📄 Fichier Mermaid généré : %s\n", outputFilename);
+    printf("Fichier Mermaid généré : %s\n", outputFilename);
 
     freeAdjacencyList(&adjList);
 }
 
-//  INDICATIONS POUR LE CORRECTEUR /!\
-//  ECRIVEZ LE CHEMIN ABSOLU DES FICHIERS EXEMPLES POUR QUE CELA FONCTIONNE /!\
+
 
 int main() {
     const char *filenames[] = {
-        "C:/Users/tomyj/CLionProjects/Graphe-Markov/data/exemple1.txt",
-        "C:/Users/tomyj/CLionProjects/Graphe-Markov/data/exemple_valid_step3.txt",
-        "C:/Users/tomyj/CLionProjects/Graphe-Markov/data/exemple_scc1.txt",
-        "C:/Users/tomyj/CLionProjects/Graphe-Markov/data/exemple3.txt",
-        "C:/Users/tomyj/CLionProjects/Graphe-Markov/data/exemple4_2check.txt"
-    };
+        "../data/exemple1.txt",
+        "../data/exemple_valid_step3.txt",
+        "../data/exemple_scc1.txt",
+        "../data/exemple3.txt",
+        "../data/exemple4_2check.txt"
+    }; // On utilise ../ pour passer du répertoire de travail au répertoire du projet afin d'accéder au répertoire 'data'
     int numFiles = sizeof(filenames) / sizeof(filenames[0]);
 
     for (int i = 0; i < numFiles; i++) {
