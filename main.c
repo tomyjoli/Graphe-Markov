@@ -1,26 +1,7 @@
 #include <stdio.h>
 #include "utils.h"
 
-void processFile(const char *filename) {
-    printf("\n=== Traitement du fichier : %s ===\n", filename);
 
-    t_list_adjacence adjList = readGraph(filename);
-    printf("Liste d'adjacence du graphe :\n");
-    printAdjacencyList(adjList);
-
-    if (isMarkovGraph(adjList)) {
-        printf("Le graphe est un graphe de Markov valide.\n");
-    } else {
-        printf("Le graphe n'est PAS un graphe de Markov.\n");
-    }
-
-    char outputFilename[256];
-    snprintf(outputFilename, sizeof(outputFilename), "%s.mmd", filename);
-    generateMermaidFile(adjList, outputFilename);
-    printf("Fichier Mermaid généré: %s\n", outputFilename);
-
-    freeAdjacencyList(&adjList);
-}
 
 
 
@@ -38,8 +19,19 @@ int main() {
     int numFiles = sizeof(filenames) / sizeof(filenames[0]);
 
     for (int i = 0; i < numFiles; i++) {
-        processFile(filenames[i]);
-    }
+        printf("\nTraitement du fichier : %s\n", filenames[i]);
 
-    return 0;
+        t_list_adjacence adjList = readGraph(filenames[i]);
+        printf("Liste d'adjacence du graphe :\n");
+        printAdjList(adjList);
+
+        isMarkovGraph(adjList);
+
+        char outputFilename[256];
+        snprintf(outputFilename, sizeof(outputFilename), "%s.mmd", filenames[i]);
+        generateMermaidFile(adjList, outputFilename);
+        printf("Fichier Mermaid généré: %s\n", outputFilename);
+
+        freeAdjList(&adjList);
+    }
 }

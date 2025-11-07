@@ -29,10 +29,6 @@ static char *getID(int i)
 
 t_cell* createCell(int dest, float prob) {
     t_cell *newCell = (t_cell*)malloc(sizeof(t_cell));
-    if (newCell == NULL) {
-        perror("Erreur d'allocation pour une cellule");
-        exit(EXIT_FAILURE);
-    }
     newCell->dest = dest;
     newCell->prob = prob;
     newCell->next = NULL;
@@ -70,28 +66,25 @@ void freeList(t_list *list) {
     list->head = NULL;
 }
 
-t_list_adjacence createAdjacencyList(int nbSommets) {
+t_list_adjacence createAdjList(int nbSommets) {
     t_list_adjacence adjList;
     adjList.nbSommets = nbSommets;
     adjList.adjLists = (t_list*)malloc(nbSommets * sizeof(t_list));
-    if (adjList.adjLists == NULL) {
-        perror("Erreur d'allocation pour la liste d'adjacence");
-        exit(EXIT_FAILURE);
-    }
+
     for (int i = 0; i < nbSommets; i++) {
         adjList.adjLists[i] = createEmptyList();
     }
     return adjList;
 }
 
-void printAdjacencyList(t_list_adjacence adjList) {
+void printAdjList(t_list_adjacence adjList) {
     for (int i = 0; i < adjList.nbSommets; i++) {
         printf("Sommet %d:", i + 1);
         printList(adjList.adjLists[i]);
     }
 }
 
-void freeAdjacencyList(t_list_adjacence *adjList) {
+void freeAdjList(t_list_adjacence *adjList) {
     for (int i = 0; i < adjList->nbSommets; i++) {
         freeList(&adjList->adjLists[i]);
     }
@@ -101,6 +94,8 @@ void freeAdjacencyList(t_list_adjacence *adjList) {
 
 t_list_adjacence readGraph(const char *filename) {
     FILE *file = fopen(filename, "r");
+    t_list_adjacence adjList;
+
     if (file == NULL) {
         perror("Erreur à l'ouverture du fichier");
         exit(EXIT_FAILURE);
@@ -112,46 +107,56 @@ t_list_adjacence readGraph(const char *filename) {
         exit(EXIT_FAILURE);
     }
 
-    t_list_adjacence adjList = createAdjacencyList(nbSommets);
+    adjList = createAdjList(nbSommets);
 
-    int from, to;
+    int depart, arrivee;
     float prob;
-    while (fscanf(file, "%d %d %f", &from, &to, &prob) == 3) {
-        addCell(&adjList.adjLists[from - 1], to, prob);
+
+    while (fscanf(file, "%d %d %f", &depart, &arrivee, &prob) == 3) {
+        addCell(&adjList.adjLists[depart - 1], arrivee, prob);
     }
 
     fclose(file);
     return adjList;
 }
 
-int isMarkovGraph(t_list_adjacence adjList) {
+void isMarkovGraph(t_list_adjacence adjList) {
     for (int i = 0; i < adjList.nbSommets; i++) {
-        float sum = 0.0f;
-        t_cell *current = adjList.adjLists[i].head;
-        while (current != NULL) {
-            sum += current->prob;
-            current = current->next;
+        float somme = 0.0f;
+        t_cell *cur = adjList.adjLists[i].head;
+
+        while (cur != NULL) {
+            somme += cur->prob;
+            cur = cur->next;
         }
-        if (sum < 0.99f || sum > 1.01f) {  // Tolérance pour les flottants parce qu'on est sympa :)
-            printf("Erreur : Somme des probabilités pour le sommet %d = %.2f (attendu : 1.00)\n", i + 1, sum);
-            return 0;
+
+        if (somme < 0.99f || somme > 1.01f) {  // Tolérance pour les flottants parce qu'on est sympa :)
+            printf("Le graphe n'est pas un graphe de Markov car la somme des probabilités pour le sommet %d = %.2f (attendu : 1.00)\n", i + 1, somme);
+            return;
         }
     }
-    return 1;
+    printf("Le graphe est un graphe de Markov \n");
 }
 
 void generateMermaidFile(t_list_adjacence adjList, const char *filename) {
     FILE *file = fopen(filename, "w");
-    if (file == NULL) {
-        perror("Erreur à la création du fichier Mermaid");
-        exit(EXIT_FAILURE);
-    }
 
-    fprintf(file, "graph LR\n");
+    fprintf(file, "---\n    layout: elk\n    theme: neo\n    look: neo\n---\n\nflowchart LR\n");
+
+    for (int i = 0; i < adjList.nbSommets; i++) {
+        char id[10];
+        strcpy(id, getID(i+1));
+        fprintf(file, "%s((%d))\n", id, i+1);
+    }
+    fprintf(file, "\n");
+
     for (int i = 0; i < adjList.nbSommets; i++) {
         t_cell *current = adjList.adjLists[i].head;
         while (current != NULL) {
-            fprintf(file, "    %d -->|%.2f| %d\n", i + 1, current->prob, current->dest);
+            char src[10], dest[10];
+            strcpy(src, getID(i+1));
+            strcpy(dest, getID(current->dest));
+            fprintf(file, "    %s -->|%.2f| %s\n", src, current->prob, dest);
             current = current->next;
         }
     }

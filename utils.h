@@ -10,7 +10,7 @@ typedef struct Cell {
     struct Cell *next;
 } t_cell;
 
-// Structure d'une liste qui pointe vers sa tête
+// Structure d'une liste head
 typedef struct {
     t_cell *head;
 } t_list;
@@ -19,7 +19,7 @@ typedef struct {
 typedef struct {
     t_list *adjLists;
     int nbSommets;
-} t_list_adjacence;;
+} t_list_adjacence;
 
 //Lien entre deux sommets
 typedef struct {
@@ -39,7 +39,7 @@ t_cell* createCell(int dest, float prob);
 
 t_list createEmptyList();
 
-t_list_adjacence createAdjacencyList(int nbSommets);
+t_list_adjacence createAdjList(int nbSommets);
 
 t_list_adjacence readGraph(const char *filename);
 
@@ -49,11 +49,11 @@ void printList(t_list list);
 
 void freeList(t_list *list);
 
-void printAdjacencyList(t_list_adjacence adjList);
+void printAdjList(t_list_adjacence adjList);
 
-void freeAdjacencyList(t_list_adjacence *adjList);
+void freeAdjList(t_list_adjacence *adjList);
 
-int isMarkovGraph(t_list_adjacence adjList);
+void isMarkovGraph(t_list_adjacence adjList);
 
 void generateMermaidFile(t_list_adjacence adjList, const char *filename);
 
