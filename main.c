@@ -17,7 +17,7 @@ void processFile(const char *filename) {
     char outputFilename[256];
     snprintf(outputFilename, sizeof(outputFilename), "%s.mmd", filename);
     generateMermaidFile(adjList, outputFilename);
-    printf("Fichier Mermaid généré : %s\n", outputFilename);
+    printf("Fichier Mermaid généré: %s\n", outputFilename);
 
     freeAdjacencyList(&adjList);
 }
@@ -25,6 +25,9 @@ void processFile(const char *filename) {
 
 
 int main() {
+
+    system("chcp 65001 > nul"); // Active l'UTF-8 pour afficher les accents
+
     const char *filenames[] = {
         "../data/exemple1.txt",
         "../data/exemple_valid_step3.txt",
