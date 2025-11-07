@@ -17,7 +17,7 @@ void processFile(const char *filename) {
     char outputFilename[256];
     snprintf(outputFilename, sizeof(outputFilename), "%s.mmd", filename);
     generateMermaidFile(adjList, outputFilename);
-    printf("📄 Fichier Mermaid généré : %s\n", outputFilename);
+    printf("Fichier Mermaid généré : %s\n", outputFilename);
 
     freeAdjacencyList(&adjList);
 }
