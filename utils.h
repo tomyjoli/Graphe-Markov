@@ -57,4 +57,31 @@ void isMarkovGraph(t_list_adjacence adjList);
 
 void generateMermaidFile(t_list_adjacence adjList, const char *filename);
 
+//PARTIE 2
+
+typedef struct s_tarjan_vertex{
+    int id;
+    int number;
+    int nb_access;
+    int flag;        //0 ou 1
+}t_tarjan_vertex;
+
+typedef struct s_classe{
+    char nom_classe;
+    t_tarjan_vertex *sommet;
+    int nb_sommet;
+    int taille_tab;  //allocation dynamique
+}t_classe;
+
+typedef struct s_partition{
+    t_classe *classe;
+    int nb_classe;
+    int taille_classe;  //allocation dynamique
+}t_partition;
+
+
+t_tarjan_vertex graph_to_tab(int id, int num, int num_access, int flag);
+
+
+
 #endif

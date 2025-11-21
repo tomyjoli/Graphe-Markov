@@ -163,3 +163,6 @@ void generateMermaidFile(t_list_adjacence adjList, const char *filename) {
 
     fclose(file);
 }
+
+
+//PARTIE 2
