@@ -123,10 +123,6 @@ Matrix* matrix_power(const Matrix *M, int p) {
     Matrix *result = matrix_copy(M);
     for (int k = 1; k < p; k++) {
         Matrix *tmp = matrix_multiply(result, M);
-        // libération de l'ancienne matrice
-        for (int i = 0; i < result->n; i++) free(result->val[i]);
-        free(result->val);
-        free(result);
         result = tmp;
     }
     return result;

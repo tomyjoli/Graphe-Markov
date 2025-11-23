@@ -50,7 +50,7 @@ int main() {
 
     analyserProprietes(partition, tab_liens);
 
-    // Distribution stationnaire etape 2 et 3 partie 3
+    // Distribution stationnaire etape 2 et 3 partie 3 utilisation de l'ia pour intégrer dans le main
     printf("\n=== Distributions stationnaires par composante ===\n");
     Matrix *A = matrix_from_adjacency(&adjList);
 
@@ -150,24 +150,10 @@ int main() {
 
             // prochaine puissance
             Matrix *next = matrix_multiply(curr, A);
-
-            // libérer prev
-            for (int i = 0; i < prev->n; i++) free(prev->val[i]);
-            free(prev->val);
-            free(prev);
-
             prev = curr;
             curr = next;
             n++;
         }
-
-        // libération mémoire
-        for (int i = 0; i < prev->n; i++) free(prev->val[i]);
-        free(prev->val);
-        free(prev);
-        for (int i = 0; i < curr->n; i++) free(curr->val[i]);
-        free(curr->val);
-        free(curr);
 
         freeAdjList(&adj);
     }
@@ -227,4 +213,3 @@ int main() {
 
     return 0;
 }
-
