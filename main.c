@@ -1,7 +1,8 @@
 #include <stdio.h>
 #include "utils.h"
 #include "matrix.h"
-
+#include "tarjan.h"
+#include "hasse.h"
 int main() {
     system("chcp 65001 > nul"); // Active l'UTF-8 pour afficher les accents
 
@@ -17,18 +18,10 @@ int main() {
     for (int i = 0; i < numFiles; i++) {
         printf("\nTraitement du fichier : %s\n", filenames[i]);
 
+        // PARTIE 1
         t_list_adjacence adjList = readGraph(filenames[i]);
         printf("Liste d'adjacence du graphe :\n");
         printAdjList(adjList);
-
-        t_partition partition;
-        tarjan_algo(adjList, &partition);
-        afficher_partition(partition);
-
-        char hasseFilename[256];
-        snprintf(hasseFilename, sizeof(hasseFilename), "%s_hasse.mmd", filenames[i]);
-        generer_diagramme_hasse(adjList, partition, hasseFilename);
-        liberer_partition(&partition);
 
         isMarkovGraph(adjList);
 
@@ -37,6 +30,26 @@ int main() {
         generateMermaidFile(adjList, outputFilename);
         printf("Fichier Mermaid généré: %s\n", outputFilename);
 
+        // PARTIE 2
+        t_partition partition;
+        tarjanAlgo(adjList, &partition);
+
+        printf("\nComposantes fortement connexes trouvées :\n");
+        afficherPartition(partition);
+
+        t_link_array tab_liens;
+        construireLiensHasse(adjList, partition, &tab_liens);
+
+        removeTransitiveLinks(&tab_liens);
+
+        char hasseFilename[256];
+        snprintf(hasseFilename, sizeof(hasseFilename), "%s_hasse.mmd", filenames[i]);
+        genererMermaidHasse(partition, tab_liens, hasseFilename);
+        printf("Diagramme de Hasse généré: %s\n", hasseFilename);
+
+        analyserProprietes(partition, tab_liens);
+
+        free(tab_liens.links);
         freeAdjList(&adjList);
     }
     printf("\n=== TEST DES MATRICES ===\n");
