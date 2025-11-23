@@ -2,6 +2,8 @@
 #include "hasse.h"
 #include <stdlib.h>
 
+
+//Créer un tableau de liens à partir d'une liste d'adjacence
 t_link_array createLinkArray(t_list_adjacence adjList) {
     t_link_array linkArray;
     linkArray.phy_size = adjList.nbSommets * adjList.nbSommets; // Taille max possible
@@ -25,6 +27,8 @@ t_link_array createLinkArray(t_list_adjacence adjList) {
     return linkArray;
 }
 
+
+//Supprimer les liens transitifs (pour obtenir le plus petit diagramme de Hasse possible)
 void removeTransitiveLinks(t_link_array *p_link_array)
 {
     int i = 0;
@@ -40,7 +44,6 @@ void removeTransitiveLinks(t_link_array *p_link_array)
                 t_link link2 = p_link_array->links[j];
                 if (link1.from == link2.from)
                 {
-                    // look for a link from link2.to to link1.to
                     int k = 0;
                     while (k < p_link_array->log_size && !to_remove)
                     {
@@ -60,7 +63,6 @@ void removeTransitiveLinks(t_link_array *p_link_array)
         }
         if (to_remove)
         {
-            // remove link1 by replacing it with the last link
             p_link_array->links[i] = p_link_array->links[p_link_array->log_size - 1];
             p_link_array->log_size--;
         }

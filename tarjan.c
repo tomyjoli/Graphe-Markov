@@ -4,7 +4,7 @@
 #include <string.h>
 
 
-// Étape 2.1 : Initialise le tableau de sommets pour Tarjan
+//Initialise le tableau de sommets pour Tarjan
 t_tarjan_vertex* initialiserTarjan(t_list_adjacence graphe) {
     int i, n = graphe.nbSommets;
     t_tarjan_vertex *tab = (t_tarjan_vertex*)malloc(n * sizeof(t_tarjan_vertex));
@@ -18,12 +18,12 @@ t_tarjan_vertex* initialiserTarjan(t_list_adjacence graphe) {
         tab[i].id = i + 1; // A partir de 1
         tab[i].numero = -1;
         tab[i].nbAcces = -1;
-        tab[i].booleen = 0; // Pas dans la pile
+        tab[i].booleen = 0; // 0 = Pas dans la pile
     }
     return tab;
 }
 
-// Étape 2.2 : Fonctions de gestion de la pile
+//Fonctions de gestion de la pile
 t_pile creerPile(int capacite) {
     t_pile p;
     p.capacite = capacite;
@@ -38,7 +38,7 @@ t_pile creerPile(int capacite) {
     return p;
 }
 
-// Ajoute un sommet au sommet de la pile
+//Ajoute un sommet au sommet de la pile
 void push(t_pile *p, t_tarjan_vertex *v) {
     if (p->sommet+1 >= p->capacite) {
         p->capacite *= 2;
@@ -51,7 +51,7 @@ void push(t_pile *p, t_tarjan_vertex *v) {
     p->tab[++(p->sommet)] = v;
 }
 
-// Retire et renvoie le sommet au sommet de la pile
+//Retire et renvoie le sommet au sommet de la pile
 t_tarjan_vertex* pop(t_pile *p) {
     if (p->sommet >= 0) {
         return p->tab[(p->sommet)--];
@@ -59,13 +59,13 @@ t_tarjan_vertex* pop(t_pile *p) {
     return NULL;
 }
 
-// Vérifie si la pile est vide (retourne 1 si vide, 0 sinon)
+//Vérifie si la pile est vide (retourne 1 si vide, 0 sinon)
 int estVide(t_pile p) {
     return (p.sommet == -1);
 }
 
 
-// Ajoute une nouvelle classe vide à la partition
+//Ajoute une nouvelle classe vide à la partition
 void ajouterClassePartition(t_partition *p, t_classe *nouvelleClasse) {
     // Si le tableau de classes est plein, on l'agrandit
     if (p->nbClasse >= p->tailleClasse) {
@@ -77,7 +77,7 @@ void ajouterClassePartition(t_partition *p, t_classe *nouvelleClasse) {
 
 }
 
-// Ajoute un sommet à la dernière classe créée
+//Ajoute un sommet à la dernière classe créée
 void ajouterSommetClasse(t_classe *c, int id) {
     // Si la classe est pleine, on l'agrandit
     if (c->nbSommets >= c->capaciteMax) {
@@ -88,9 +88,7 @@ void ajouterSommetClasse(t_classe *c, int id) {
     c->sommets[c->nbSommets++] = id;
 }
 
-
-
-// Paramètres : indice du sommet v, graphe, tableau des infos, pile, partition, pointeur vers temps
+//Parcourir le graphe et identifier les composantes fortement connexes
 void parcoursTarjan(int index, t_list_adjacence graphe, t_tarjan_vertex *tab, t_pile *pile, t_partition *partition, int *compteur) {
     t_tarjan_vertex *v = &tab[index];
     v->numero = *compteur;
@@ -98,7 +96,7 @@ void parcoursTarjan(int index, t_list_adjacence graphe, t_tarjan_vertex *tab, t_
     (*compteur)++;
 
     push(pile, v);
-    v->booleen = 1; // dans la pile
+    v->booleen = 1;
 
     t_cell *courant = graphe.adjLists[index].head;
     while (courant != NULL) {
@@ -134,19 +132,19 @@ void parcoursTarjan(int index, t_list_adjacence graphe, t_tarjan_vertex *tab, t_
 }
 
 
-// Étape 3.2 : Fonction principale tarjan
+//Fonction principale tarjan
 void tarjanAlgo(t_list_adjacence graphe, t_partition *partition) {
     t_tarjan_vertex *tab = initialiserTarjan(graphe);
     int n = graphe.nbSommets;
     t_pile pile = creerPile(n);
     int compteur = 0;
 
-    // Initialiser la partition
+    //Initialiser la partition
     partition->nbClasse = 0;
     partition->tailleClasse = 10;
     partition->classes = malloc(partition->tailleClasse * sizeof(t_classe));
 
-    // Lancer le parcours pour chaque sommet non visité
+    //Lancer le parcours pour chaque sommet non visité
     for (int i = 0; i < n; i++) {
         if (tab[i].numero == -1) {
             parcoursTarjan(i, graphe, tab, &pile, partition, &compteur);
@@ -157,7 +155,7 @@ void tarjanAlgo(t_list_adjacence graphe, t_partition *partition) {
     free(tab);
 }
 
-// Afficher la partition
+//Afficher la partition
 void afficherPartition(t_partition partition) {
     for (int i = 0; i < partition.nbClasse; i++) {
         printf("Composante %s: {", partition.classes[i].nom_classe);
@@ -174,17 +172,17 @@ void afficherPartition(t_partition partition) {
 
 // Etape 2 - Diagramme de Hasse
 
-// Remplire sommet2classe[i] = indice de la classe du sommet
+//Remplir sommet2classe[i] = indice de la classe du sommet
 void remplirAppartenance(int *sommet2classe, t_partition partition, int n) {
     for (int i = 0; i < partition.nbClasse; i++) {
         for (int j = 0; j < partition.classes[i].nbSommets; j++) {
-            int sommet = partition.classes[i].sommets[j]; // Sommet 1-based (ex: 1,2,3..)
+            int sommet = partition.classes[i].sommets[j];
             sommet2classe[sommet - 1] = i; // Stocke l'indice de classe
         }
     }
 }
 
-// Vérifier si le lien (from -> to) existe déjà dans le t_link_array
+//Vérifier si le lien (from -> to) existe déjà dans le t_link_array
 int lienExiste(t_link_array *tab_liens, int from, int to) {
     for (int i = 0; i < tab_liens->log_size; i++) {
         if (tab_liens->links[i].from == from && tab_liens->links[i].to == to)
@@ -193,7 +191,7 @@ int lienExiste(t_link_array *tab_liens, int from, int to) {
     return 0;
 }
 
-// Ajoute un lien unique (from -> to) dans le t_link_array (avec realloc au besoin)
+//Ajoute un lien unique (from -> to) dans le t_link_array (avec realloc au besoin)
 void ajouterLienUnique(t_link_array *tab_liens, int from, int to) {
     if (!lienExiste(tab_liens, from, to)) {
         if (tab_liens->log_size >= tab_liens->phy_size) {
@@ -207,7 +205,7 @@ void ajouterLienUnique(t_link_array *tab_liens, int from, int to) {
     }
 }
 
-// Recense tous les liens entre classes dans le diagramme de Hasse pour un graphe et une partition
+//Recense tous les liens entre classes dans le diagramme de Hasse pour un graphe et une partition
 void construireLiensHasse(t_list_adjacence graphe, t_partition partition, t_link_array *tab_liens) {
     int n = graphe.nbSommets;
     int *sommet2classe = malloc(n * sizeof(int));
@@ -219,7 +217,7 @@ void construireLiensHasse(t_list_adjacence graphe, t_partition partition, t_link
     tab_liens->log_size = 0;
     tab_liens->links = malloc(tab_liens->phy_size * sizeof(t_link));
 
-    // Parcourir tous les sommets et voisins
+    //Parcourir tous les sommets et voisins
     for (int i = 0; i < n; i++) {
         int classe_src = sommet2classe[i];
         t_cell *succ = graphe.adjLists[i].head;
@@ -236,7 +234,7 @@ void construireLiensHasse(t_list_adjacence graphe, t_partition partition, t_link
     free(sommet2classe);
 }
 
-// Génère le diagramme de Hasse au format Mermaid
+//Génère le diagramme de Hasse au format Mermaid
 void genererMermaidHasse(t_partition partition, t_link_array tab_liens, const char *filename) {
     FILE *f = fopen(filename, "w");
 
@@ -258,11 +256,11 @@ void genererMermaidHasse(t_partition partition, t_link_array tab_liens, const ch
 
 // Étape 3 : Caractéristiques du graphe
 
-// Analyser et afficher les propriétés
+//Analyser et afficher les propriétés
 void analyserProprietes(t_partition partition, t_link_array tab_liens) {
     printf("\n--- Caractéristiques du graphe ---\n");
 
-    // Le graphe est irréductible si et seulement si une seule classe
+    //Le graphe est irréductible si et seulement si une seule classe
     int est_irreductible = (partition.nbClasse == 1);
 
     for (int i = 0; i < partition.nbClasse; i++) {

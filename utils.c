@@ -66,6 +66,7 @@ void freeList(t_list *list) {
     list->head = NULL;
 }
 
+//Créer une liste d'adjacence à partir d'un sommet
 t_list_adjacence createAdjList(int nbSommets) {
     t_list_adjacence adjList;
     adjList.nbSommets = nbSommets;
@@ -77,6 +78,7 @@ t_list_adjacence createAdjList(int nbSommets) {
     return adjList;
 }
 
+//Affiche une liste d'adjacence
 void printAdjList(t_list_adjacence adjList) {
     for (int i = 0; i < adjList.nbSommets; i++) {
         printf("Sommet %d:", i + 1);
@@ -84,6 +86,7 @@ void printAdjList(t_list_adjacence adjList) {
     }
 }
 
+//Libérer les listes d'adjacences
 void freeAdjList(t_list_adjacence *adjList) {
     for (int i = 0; i < adjList->nbSommets; i++) {
         freeList(&adjList->adjLists[i]);
@@ -92,6 +95,7 @@ void freeAdjList(t_list_adjacence *adjList) {
     adjList->nbSommets = 0;
 }
 
+//Lire un graphe à partir d'un fichier texte
 t_list_adjacence readGraph(const char *filename) {
     FILE *file = fopen(filename, "r");
     t_list_adjacence adjList;
@@ -120,6 +124,7 @@ t_list_adjacence readGraph(const char *filename) {
     return adjList;
 }
 
+//Vérifie si un graphe est un graphe de Markov
 void isMarkovGraph(t_list_adjacence adjList) {
     for (int i = 0; i < adjList.nbSommets; i++) {
         float somme = 0.0f;
@@ -138,6 +143,7 @@ void isMarkovGraph(t_list_adjacence adjList) {
     printf("Le graphe est un graphe de Markov \n");
 }
 
+//Générer un fichier Mermaid pour visualiser le graphe (enfin fonctionnel !!)
 void generateMermaidFile(t_list_adjacence adjList, const char *filename) {
     FILE *file = fopen(filename, "w");
 

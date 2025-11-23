@@ -3,16 +3,19 @@
 #include "matrix.h"
 #include "tarjan.h"
 #include "hasse.h"
+
+
 int main() {
     system("chcp 65001 > nul"); // Active l'UTF-8 pour afficher les accents
 
+    //Charger des graphes à partir de fichiers
     const char *filenames[] = {
         "../data/exemple1.txt",
         "../data/exemple_valid_step3.txt",
         "../data/exemple_scc1.txt",
         "../data/exemple3.txt",
         "../data/exemple4_2check.txt"
-    }; // On utilise ../ pour passer du répertoire de travail au répertoire du projet afin d'accéder au répertoire 'data'
+    };
     const char *meteoFile = "../data/exemple_meteo.txt";
 
     int numFiles = sizeof(filenames) / sizeof(filenames[0]);
@@ -33,6 +36,8 @@ int main() {
         printf("Fichier Mermaid généré: %s\n", outputFilename);
 
         // PARTIE 2
+
+        //Appliquer l'algorithme de tarjan pour trouver les composantes fortement connexes
         t_partition partition;
         tarjanAlgo(adjList, &partition);
 
@@ -44,11 +49,13 @@ int main() {
 
         removeTransitiveLinks(&tab_liens);
 
+        //Construire le diagramme de Hasse
         char hasseFilename[256];
         snprintf(hasseFilename, sizeof(hasseFilename), "%s_hasse.mmd", filenames[i]);
         genererMermaidHasse(partition, tab_liens, hasseFilename);
         printf("Diagramme de Hasse généré: %s\n", hasseFilename);
 
+        //Analyser les propriétés des graphes (irréductible/transitoire/persistant)
         analyserProprietes(partition, tab_liens);
 
         free(tab_liens.links);
@@ -112,7 +119,7 @@ int main() {
             n++;
         }
 
-        // libération mémoire
+        // libération de la mémoire
         for (int i = 0; i < prev->n; i++) free(prev->val[i]);
         free(prev->val);
         free(prev);
