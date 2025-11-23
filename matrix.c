@@ -132,3 +132,52 @@ Matrix* matrix_power(const Matrix *M, int p) {
     return result;
 }
 
+//Etape 3 partie 3
+//Etape 3 partie 3
+
+// Fonction pour calculer le pgcd de plusieurs entiers
+int gcd(int *vals, int nbvals) {
+    if (nbvals == 0) return 0;
+    int result = vals[0];
+    for (int i = 1; i < nbvals; i++) {
+        int a = result, b = vals[i];
+        while (b != 0) {
+            int temp = b;
+            b = a % b;
+            a = temp;
+        }
+        result = a;
+    }
+    return result;
+}
+
+// Calcul de la période d'une sous-matrice (classe)
+int getPeriodMatrix(Matrix *sub) {
+    int n = sub->n;
+    int *periods = malloc(n * sizeof(int));
+    int period_count = 0;
+
+    Matrix *power = matrix_copy(sub);
+    Matrix *tmp = NULL;
+
+    for (int cpt = 1; cpt <= n; cpt++) {
+        int diag_nonzero = 0;
+        for (int i = 0; i < n; i++)
+            if (power->val[i][i] > 0.0) diag_nonzero = 1;
+
+        if (diag_nonzero) periods[period_count++] = cpt;
+
+        tmp = matrix_multiply(power, sub);
+        for (int i = 0; i < power->n; i++) free(power->val[i]);
+        free(power->val); free(power);
+        power = tmp;
+    }
+
+    int period = gcd(periods, period_count);
+    free(periods);
+
+    for (int i = 0; i < power->n; i++) free(power->val[i]);
+    free(power->val); free(power);
+
+    return period;
+}

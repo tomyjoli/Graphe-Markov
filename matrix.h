@@ -28,4 +28,10 @@ void printMatrix(const Matrix *M);
 
 Matrix* matrix_power(const Matrix *M, int p);
 
+//Fonction du bonus
+
+int gcd(int *vals, int nbvals);
+
+int getPeriodMatrix(Matrix *sub);
+
 #endif //MATRIX_H

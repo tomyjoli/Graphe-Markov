@@ -50,7 +50,7 @@ int main() {
 
     analyserProprietes(partition, tab_liens);
 
-    // Distribution stationnaire
+    // Distribution stationnaire etape 2 et 3 partie 3
     printf("\n=== Distributions stationnaires par composante ===\n");
     Matrix *A = matrix_from_adjacency(&adjList);
 
@@ -60,7 +60,29 @@ int main() {
         Matrix *sub = subMatrix(A, partition, c);
         if (!sub || sub->n == 0) { free(sub); continue; }
 
-        Matrix *subStationnaire = matrix_power(sub, 50);
+        // Calcul de la période (etape 3 partie 3)
+        int period = getPeriodMatrix(sub);
+        printf("Période de la composante: %d\n", period);
+
+        // Distribution stationnaire (approximation)
+        Matrix *subStationnaire;
+        if (period == 1) {
+            // convergence normale
+            subStationnaire = matrix_power(sub, 50);
+        } else {
+            // cas périodique : moyenne sur les puissances jusqu'à period
+            subStationnaire = matrix_create_zero(sub->n);
+            for (int k = 0; k < period; k++) {
+                Matrix *tmp = matrix_power(sub, k+1);
+                for (int i = 0; i < sub->n; i++)
+                    for (int j = 0; j < sub->n; j++)
+                        subStationnaire->val[i][j] += tmp->val[i][j] / period;
+
+                // libération tmp
+                for (int i = 0; i < tmp->n; i++) free(tmp->val[i]);
+                free(tmp->val); free(tmp);
+            }
+        }
         printf("Matrice après convergence :\n");
         printMatrix(subStationnaire);
 
@@ -80,25 +102,25 @@ int main() {
     free(tab_liens.links);
     freeAdjList(&adjList);
 }
+    //Etape 1 partie 3
+    printf("\nTEST DES MATRICES\n");
 
-    printf("\n=== TEST DES MATRICES ===\n");
-
-    printf("\n=== Matrice M pour l'exemple météo ===\n");
+    printf("\nMatrice M pour l'exemple météo\n");
 
     t_list_adjacence meteoAdj = readGraph(meteoFile);
     Matrix *M = matrix_from_adjacency(&meteoAdj);
 
     printMatrix(M);
 
-    printf("\n=== M^3 ===\n");
+    printf("\nM^3\n");
     Matrix *M3 = matrix_power(M, 3);
     printMatrix(M3);
 
-    printf("\n=== M^7 ===\n");
+    printf("\nM^7\n");
     Matrix *M7 = matrix_power(M, 7);
     printMatrix(M7);
 
-    printf("\n===== TEST DE CONVERGENCE POUR LES EXEMPLES =====\n");
+    printf("\nTEST DE CONVERGENCE POUR LES EXEMPLES\n");
 
     const double EPS = 0.01;
 
@@ -150,6 +172,59 @@ int main() {
         freeAdjList(&adj);
     }
     freeAdjList(&meteoAdj);
+
+    //Défi 2 : exemple_defi.txt
+    printf("\nDéfi 2 : Calcul des périodes et distributions stationnaires\n");
+    const char *defiFile = "../data/exemple_defi.txt";
+    t_list_adjacence defiAdj = readGraph(defiFile);
+    printf("Liste d'adjacence du graphe :\n");
+    printAdjList(defiAdj);
+
+    t_partition defiPartition;
+    tarjanAlgo(defiAdj, &defiPartition);
+    printf("\nComposantes fortement connexes trouvées :\n");
+    afficherPartition(defiPartition);
+
+    Matrix *A_defi = matrix_from_adjacency(&defiAdj);
+    for (int c = 0; c < defiPartition.nbClasse; c++) {
+        printf("\n--- Composante %s ---\n", defiPartition.classes[c].nom_classe);
+
+        Matrix *sub = subMatrix(A_defi, defiPartition, c);
+        if (!sub || sub->n == 0) { free(sub); continue; }
+
+        int period = getPeriodMatrix(sub);
+        printf("Période de la composante : %d\n", period);
+
+        Matrix *subStationnaire;
+        if (period == 1) {
+            subStationnaire = matrix_power(sub, 50);
+        } else {
+            subStationnaire = matrix_create_zero(sub->n);
+            for (int k = 0; k < period; k++) {
+                Matrix *tmp = matrix_power(sub, k+1);
+                for (int i = 0; i < sub->n; i++)
+                    for (int j = 0; j < sub->n; j++)
+                        subStationnaire->val[i][j] += tmp->val[i][j] / period;
+
+                for (int i = 0; i < tmp->n; i++) free(tmp->val[i]);
+                free(tmp->val); free(tmp);
+            }
+        }
+        printf("Matrice après convergence :\n");
+        printMatrix(subStationnaire);
+
+        for (int j = 0; j < sub->n; j++) free(sub->val[j]);
+        free(sub->val); free(sub);
+
+        for (int j = 0; j < subStationnaire->n; j++) free(subStationnaire->val[j]);
+        free(subStationnaire->val); free(subStationnaire);
+    }
+    for (int j = 0; j < A_defi->n; j++) free(A_defi->val[j]);
+    free(A_defi->val); free(A_defi);
+    freeAdjList(&defiAdj);
+
+    // au niveau du défi 2 il y'a un soucis et le sommet 8 ne semble pas être détecté alors qu'il serait que la période de sa composante serait également 3 j'ai essayé de demandé à chat mais ça n'a pas vrm fonctionné
+
     return 0;
 }
 
