@@ -86,6 +86,31 @@ double matrix_diff(const Matrix *M, const Matrix *N) {
         return diff;
     }
 
+Matrix* subMatrix(Matrix *matrix, t_partition part, int compo_index) {
+    if (compo_index < 0 || compo_index >= part.nbClasse) {
+        fprintf(stderr, "Erreur: indice de composante invalide\n");
+        return NULL;
+    }
+
+    t_classe classe = part.classes[compo_index];
+    int n = classe.nbSommets;
+
+    if (n == 0) return NULL;  // composante vide
+
+    Matrix *sub = matrix_create_zero(n);
+
+    // Remplissage de la sous-matrice
+    for (int i = 0; i < n; i++) {
+        int orig_i = classe.sommets[i] - 1; // conversion 1-based -> 0-based
+        for (int j = 0; j < n; j++) {
+            int orig_j = classe.sommets[j] - 1;
+            sub->val[i][j] = matrix->val[orig_i][orig_j];
+        }
+    }
+
+    return sub;
+}
+
 void printMatrix(const Matrix *M) {
     for (int i = 0; i < M->n; i++) {
         for (int j = 0; j < M->n; j++)
@@ -98,7 +123,12 @@ Matrix* matrix_power(const Matrix *M, int p) {
     Matrix *result = matrix_copy(M);
     for (int k = 1; k < p; k++) {
         Matrix *tmp = matrix_multiply(result, M);
+        // libération de l'ancienne matrice
+        for (int i = 0; i < result->n; i++) free(result->val[i]);
+        free(result->val);
+        free(result);
         result = tmp;
     }
     return result;
 }
+
