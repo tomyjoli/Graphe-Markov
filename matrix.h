@@ -19,4 +19,10 @@ Matrix *matrix_multiply(const Matrix *A, const Matrix *B);
 
 double matrix_diff(const Matrix *M, const Matrix *N);
 
+//Fonctions non demandé mais utile pour les validations
+
+void printMatrix(const Matrix *M);
+
+Matrix* matrix_power(const Matrix *M, int p);
+
 #endif //MATRIX_H

@@ -34,7 +34,7 @@ Matrix *matrix_from_adjacency(const t_list_adjacence *adj) {
     for (int i = 0; i < n; i++) {
         t_cell *cell = adj->adjLists[i].head;
         while (cell) {
-            int j = cell->dest;
+            int j = cell->dest - 1;
             if (j >= 0 && j < n) {
                 m->val[i][j] = cell->prob;
             }
@@ -85,3 +85,20 @@ double matrix_diff(const Matrix *M, const Matrix *N) {
 
         return diff;
     }
+
+void printMatrix(const Matrix *M) {
+    for (int i = 0; i < M->n; i++) {
+        for (int j = 0; j < M->n; j++)
+            printf("%0.4f ", M->val[i][j]);
+        printf("\n");
+    }
+}
+
+Matrix* matrix_power(const Matrix *M, int p) {
+    Matrix *result = matrix_copy(M);
+    for (int k = 1; k < p; k++) {
+        Matrix *tmp = matrix_multiply(result, M);
+        result = tmp;
+    }
+    return result;
+}

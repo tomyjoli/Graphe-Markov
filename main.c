@@ -13,6 +13,8 @@ int main() {
         "../data/exemple3.txt",
         "../data/exemple4_2check.txt"
     }; // On utilise ../ pour passer du répertoire de travail au répertoire du projet afin d'accéder au répertoire 'data'
+    const char *meteoFile = "../data/exemple_meteo.txt";
+
     int numFiles = sizeof(filenames) / sizeof(filenames[0]);
 
     for (int i = 0; i < numFiles; i++) {
@@ -54,57 +56,72 @@ int main() {
     }
     printf("\n=== TEST DES MATRICES ===\n");
 
-    // Création d'un petit graphe de 3 sommets
-    t_list_adjacence testGraph;
-    testGraph.nbSommets = 3;
-    testGraph.adjLists = malloc(3 * sizeof(t_list));
-    for (int i = 0; i < 3; i++) {
-        testGraph.adjLists[i].head = NULL;
+    printf("\n=== Matrice M pour l'exemple météo ===\n");
+
+    t_list_adjacence meteoAdj = readGraph(meteoFile);
+    Matrix *M = matrix_from_adjacency(&meteoAdj);
+
+    printMatrix(M);
+
+    printf("\n=== M^3 ===\n");
+    Matrix *M3 = matrix_power(M, 3);
+    printMatrix(M3);
+
+    printf("\n=== M^7 ===\n");
+    Matrix *M7 = matrix_power(M, 7);
+    printMatrix(M7);
+
+    printf("\n===== TEST DE CONVERGENCE POUR LES EXEMPLES =====\n");
+
+    const double EPS = 0.01;
+
+    for (int f = 0; f < numFiles; f++) {
+
+        printf("\n--- Fichier : %s ---\n", filenames[f]);
+
+        t_list_adjacence adj = readGraph(filenames[f]);
+        Matrix *A = matrix_from_adjacency(&adj);
+
+        Matrix *prev = matrix_copy(A);
+        Matrix *curr = matrix_multiply(A, A);
+
+        int n = 2;
+        while (1) {
+            double d = matrix_diff(curr, prev);
+
+            if (d < EPS) {
+                printf("Convergence atteinte pour n = %d (diff = %.4f)\n", n, d);
+                break;
+            }
+
+            if (n > 200) {
+                printf("Pas de convergence pour ce fichier (jusqu'à n = 200)\n");
+                break;
+            }
+
+            // prochaine puissance
+            Matrix *next = matrix_multiply(curr, A);
+
+            // libérer prev
+            for (int i = 0; i < prev->n; i++) free(prev->val[i]);
+            free(prev->val);
+            free(prev);
+
+            prev = curr;
+            curr = next;
+            n++;
+        }
+
+        // libération mémoire
+        for (int i = 0; i < prev->n; i++) free(prev->val[i]);
+        free(prev->val);
+        free(prev);
+        for (int i = 0; i < curr->n; i++) free(curr->val[i]);
+        free(curr->val);
+        free(curr);
+
+        freeAdjList(&adj);
     }
-
-    // Ajout de quelques arcs avec probabilités
-    t_cell *c1 = malloc(sizeof(t_cell)); c1->dest = 1; c1->prob = 0.5; c1->next = NULL;
-    t_cell *c2 = malloc(sizeof(t_cell)); c2->dest = 2; c2->prob = 0.5; c2->next = NULL;
-    testGraph.adjLists[0].head = c1; c1->next = c2;
-
-    t_cell *c3 = malloc(sizeof(t_cell)); c3->dest = 0; c3->prob = 1.0; c3->next = NULL;
-    testGraph.adjLists[1].head = c3;
-
-    t_cell *c4 = malloc(sizeof(t_cell)); c4->dest = 2; c4->prob = 1.0; c4->next = NULL;
-    testGraph.adjLists[2].head = c4;
-
-    // Création de la matrice de probabilités
-    Matrix *mat = matrix_from_adjacency(&testGraph);
-    printf("Matrice de probabilités :\n");
-    for (int i = 0; i < mat->n; i++) {
-        for (int j = 0; j < mat->n; j++)
-            printf("%0.2f ", mat->val[i][j]);
-        printf("\n");
-    }
-
-    // Test de la copie
-    Matrix *copy = matrix_copy(mat);
-    printf("\nMatrice copiée :\n");
-    for (int i = 0; i < copy->n; i++) {
-        for (int j = 0; j < copy->n; j++)
-            printf("%0.2f ", copy->val[i][j]);
-        printf("\n");
-    }
-
-    // Test de multiplication
-    Matrix *mult = matrix_multiply(mat, copy);
-    printf("\nMatrice multipliée (mat * copy) :\n");
-    for (int i = 0; i < mult->n; i++) {
-        for (int j = 0; j < mult->n; j++)
-            printf("%0.2f ", mult->val[i][j]);
-        printf("\n");
-    }
-
-    // Test de différence
-    double diff = matrix_diff(mat, copy);
-    printf("\nDifférence entre mat et copy : %0.2f\n", diff);
+    freeAdjList(&meteoAdj);
+    return 0;
 }
-
-
-//printf("\nFin du programme. Appuyez sur Entree pour quitter.\n");
-//getchar(); // Pause pour voir le résultat si lancé hors terminal
