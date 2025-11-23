@@ -3,6 +3,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include "utils.h"
+#include "tarjan.h"
 
 typedef struct {
     int n;          // dimension (n x n)
@@ -18,6 +19,8 @@ Matrix *matrix_copy(const Matrix *src);
 Matrix *matrix_multiply(const Matrix *A, const Matrix *B);
 
 double matrix_diff(const Matrix *M, const Matrix *N);
+
+Matrix* subMatrix(Matrix* matrix, t_partition part, int compo_index);
 
 //Fonctions non demandé mais utile pour les validations
 

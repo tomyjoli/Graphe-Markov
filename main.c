@@ -18,42 +18,69 @@ int main() {
     int numFiles = sizeof(filenames) / sizeof(filenames[0]);
 
     for (int i = 0; i < numFiles; i++) {
-        printf("\nTraitement du fichier : %s\n", filenames[i]);
+    printf("\nTraitement du fichier : %s\n", filenames[i]);
 
-        // PARTIE 1
-        t_list_adjacence adjList = readGraph(filenames[i]);
-        printf("Liste d'adjacence du graphe :\n");
-        printAdjList(adjList);
+    // Lecture du graphe
+    t_list_adjacence adjList = readGraph(filenames[i]);
+    printf("Liste d'adjacence du graphe :\n");
+    printAdjList(adjList);
 
-        isMarkovGraph(adjList);
+    isMarkovGraph(adjList);
 
-        char outputFilename[256];
-        snprintf(outputFilename, sizeof(outputFilename), "%s.mmd", filenames[i]);
-        generateMermaidFile(adjList, outputFilename);
-        printf("Fichier Mermaid généré: %s\n", outputFilename);
+    char outputFilename[256];
+    snprintf(outputFilename, sizeof(outputFilename), "%s.mmd", filenames[i]);
+    generateMermaidFile(adjList, outputFilename);
+    printf("Fichier Mermaid généré: %s\n", outputFilename);
 
-        // PARTIE 2
-        t_partition partition;
-        tarjanAlgo(adjList, &partition);
+    // Composantes fortement connexes
+    t_partition partition;
+    tarjanAlgo(adjList, &partition);
+    printf("\nComposantes fortement connexes trouvées :\n");
+    afficherPartition(partition);
 
-        printf("\nComposantes fortement connexes trouvées :\n");
-        afficherPartition(partition);
+    // Hasse
+    t_link_array tab_liens;
+    construireLiensHasse(adjList, partition, &tab_liens);
+    removeTransitiveLinks(&tab_liens);
 
-        t_link_array tab_liens;
-        construireLiensHasse(adjList, partition, &tab_liens);
+    char hasseFilename[256];
+    snprintf(hasseFilename, sizeof(hasseFilename), "%s_hasse.mmd", filenames[i]);
+    genererMermaidHasse(partition, tab_liens, hasseFilename);
+    printf("Diagramme de Hasse généré: %s\n", hasseFilename);
 
-        removeTransitiveLinks(&tab_liens);
+    analyserProprietes(partition, tab_liens);
 
-        char hasseFilename[256];
-        snprintf(hasseFilename, sizeof(hasseFilename), "%s_hasse.mmd", filenames[i]);
-        genererMermaidHasse(partition, tab_liens, hasseFilename);
-        printf("Diagramme de Hasse généré: %s\n", hasseFilename);
+    // Distribution stationnaire
+    printf("\n=== Distributions stationnaires par composante ===\n");
+    Matrix *A = matrix_from_adjacency(&adjList);
 
-        analyserProprietes(partition, tab_liens);
+    for (int c = 0; c < partition.nbClasse; c++) {
+        printf("\n--- Composante %s ---\n", partition.classes[c].nom_classe);
 
-        free(tab_liens.links);
-        freeAdjList(&adjList);
+        Matrix *sub = subMatrix(A, partition, c);
+        if (!sub || sub->n == 0) { free(sub); continue; }
+
+        Matrix *subStationnaire = matrix_power(sub, 50);
+        printf("Matrice après convergence :\n");
+        printMatrix(subStationnaire);
+
+        // Libération mémoire sous-matrices
+        for (int j = 0; j < sub->n; j++) free(sub->val[j]);
+        free(sub->val); free(sub);
+
+        for (int j = 0; j < subStationnaire->n; j++) free(subStationnaire->val[j]);
+        free(subStationnaire->val); free(subStationnaire);
     }
+
+    // Libération matrice globale
+    for (int j = 0; j < A->n; j++) free(A->val[j]);
+    free(A->val); free(A);
+
+    // Libération Hasse et graphe
+    free(tab_liens.links);
+    freeAdjList(&adjList);
+}
+
     printf("\n=== TEST DES MATRICES ===\n");
 
     printf("\n=== Matrice M pour l'exemple météo ===\n");
@@ -125,3 +152,4 @@ int main() {
     freeAdjList(&meteoAdj);
     return 0;
 }
+
