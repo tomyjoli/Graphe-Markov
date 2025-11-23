@@ -67,21 +67,57 @@ typedef struct s_tarjan_vertex{
 }t_tarjan_vertex;
 
 typedef struct s_classe{
-    char nom_classe;
-    t_tarjan_vertex *sommet;
-    int nb_sommet;
-    int taille_tab;  //allocation dynamique
+    char nom_classe[10];
+    t_tarjan_vertex **sommets;
+    int nb_sommets;
+    int capacite_max;
 }t_classe;
 
 typedef struct s_partition{
-    t_classe *classe;
+    t_classe *classes;
     int nb_classe;
     int taille_classe;  //allocation dynamique
 }t_partition;
 
+// Crée et initialise le tableau des sommets pour Tarjan
+t_tarjan_vertex *initialiser_tarjan_vertices(t_list_adjacence graphe);
 
-t_tarjan_vertex graph_to_tab(int id, int num, int num_access, int flag);
+
+// Étape 2.2 : Structure de la pile (modifiée selon ta demande)
+typedef struct {
+    t_tarjan_vertex **tab; // Tableau de pointeurs
+    int premier;           // Indice du sommet de pile (top)
+    int capacite;          // Capacité de la pile
+} t_pile;
 
 
+// Prototypes des fonctions utilitaires (Noms en français)
+t_tarjan_vertex* creer_tableau_tarjan(t_list_adjacence graphe);
+t_pile creer_pile(int capacite);
+void empiler(t_pile *p, t_tarjan_vertex *v);
+t_tarjan_vertex* depiler(t_pile *p);
+int pile_est_vide(t_pile p);
+
+
+// Étape 3 : Prototypes pour l'algorithme de Tarjan
+void tarjan_algo(t_list_adjacence graphe, t_partition *partition);
+void afficher_partition(t_partition partition);
+
+
+// Prototypes pour Hasse et Propriétés
+void generer_diagramme_hasse(t_list_adjacence graphe, t_partition partition, const char *nom_fichier);
+
+void liberer_partition(t_partition *partition);
+
+void ajouter_lien_unique(t_link_array *tab_liens, int de, int vers);
+
+int est_classe_absorbante(t_classe classe, t_list_adjacence graphe,t_partition partition);
+
+int est_classe_transitoire(t_classe classe, t_list_adjacence graphe, t_partition partition);
+
+int est_graphe_irreductible(t_partition partition);
+
+void parcours(int u_idx, t_list_adjacence graphe, t_tarjan_vertex *tab_sommets,
+              t_pile *p_pile, t_partition *partition, int *temps);
 
 #endif
