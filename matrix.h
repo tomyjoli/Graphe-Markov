@@ -19,7 +19,7 @@ Matrix *matrix_multiply(const Matrix *A, const Matrix *B);
 
 double matrix_diff(const Matrix *M, const Matrix *N);
 
-//Ces fonctions sont pas demandées mais elles sont utilent pour les validations
+//Fonctions non demandé mais utile pour les validations
 
 void printMatrix(const Matrix *M);
 

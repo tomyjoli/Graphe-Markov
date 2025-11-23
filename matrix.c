@@ -7,15 +7,15 @@
 
 Matrix *matrix_create_zero(int n) {
 
-    //Allocation de la structure Matrix
+    // Allocation de la structure Matrix
     Matrix *m = malloc(sizeof(Matrix));
 
     m->n = n;
 
-    //Allocation des lignes
+    // Allocation des lignes
     m->val = malloc(n * sizeof(double *));
 
-    //Allocation des colonnes et initialisation à 0
+    // Allocation des colonnes et initialisation à 0
     for (int i = 0; i < n; i++) {
         m->val[i] = malloc(n * sizeof(double));  // allocation simple
         for (int j = 0; j < n; j++) {
@@ -26,7 +26,6 @@ Matrix *matrix_create_zero(int n) {
     return m;
 }
 
-//Convertir une liste d'adjacence en matrice
 Matrix *matrix_from_adjacency(const t_list_adjacence *adj) {
 
     int n = adj->nbSommets;
@@ -46,7 +45,6 @@ Matrix *matrix_from_adjacency(const t_list_adjacence *adj) {
     return m;
 }
 
-//Copie une Matrice
 Matrix *matrix_copy(const Matrix *src) {
 
         Matrix *copy = matrix_create_zero(src->n);
@@ -59,7 +57,6 @@ Matrix *matrix_copy(const Matrix *src) {
         return copy;
 }
 
-//Multiplie deux matrices entre elles
 Matrix *matrix_multiply(const Matrix *A, const Matrix *B) {
 
         int n = A->n;
@@ -75,7 +72,6 @@ Matrix *matrix_multiply(const Matrix *A, const Matrix *B) {
         return C;
 }
 
-//Calcule la différence entre deux matrices
 double matrix_diff(const Matrix *M, const Matrix *N) {
 
         double diff = 0.0;
@@ -90,7 +86,6 @@ double matrix_diff(const Matrix *M, const Matrix *N) {
         return diff;
     }
 
-//Affiche une matrice
 void printMatrix(const Matrix *M) {
     for (int i = 0; i < M->n; i++) {
         for (int j = 0; j < M->n; j++)
@@ -99,7 +94,6 @@ void printMatrix(const Matrix *M) {
     }
 }
 
-//Calcule la puissance d'une matrice
 Matrix* matrix_power(const Matrix *M, int p) {
     Matrix *result = matrix_copy(M);
     for (int k = 1; k < p; k++) {
